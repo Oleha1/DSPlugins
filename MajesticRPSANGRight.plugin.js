@@ -5,6 +5,7 @@
  * @description Majestic RP Washington SANG Right Click version.
  * @source https://github.com/Oleha1/BDPlugin
  * @updateUrl https://raw.githubusercontent.com/Oleha1/BDPlugin/main/MajesticRPSANGRight.plugin.js
+ * @downloadUrl https://raw.githubusercontent.com/Oleha1/BDPlugin/main/MajesticRPSANGRight.plugin.js
  */
 
 const TARGET_GUILD_ID = "1214393279936991252";
@@ -567,4 +568,5 @@ module.exports = (() => {
 			}
 		};
 	})(window.BDFDB_Global.PluginUtils.buildPlugin({}));
+
 })();
