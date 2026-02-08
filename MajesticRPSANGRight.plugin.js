@@ -51,22 +51,26 @@ module.exports = (() => {
 			if (!match) return;
 
 			const remoteVersion = match[1];
-
+			
 			if (remoteVersion !== PLUGIN_VERSION) {
 				BdApi.UI.showConfirmationModal(
 					"Доступно обновление",
-					`Текущая версия: ${PLUGIN_VERSION}\nНовая версия: ${remoteVersion}`,
+					`Текущая версия: ${PLUGIN_VERSION}\nНовая версия: ${remoteVersion}\n\nПерезапустить Discord после обновления?`,
 					{
-						confirmText: "Обновить",
-						cancelText: null,
+						confirmText: "Обновить и перезапустить",
+						cancelText: "Отмена",
 						onConfirm: () => {
 							const fs = require("fs");
-							const path = require("path"); 
+							const path = require("path");
 
 							const pluginPath = path.join(BdApi.Plugins.folder, PLUGIN_FILE_NAME);
 							fs.writeFileSync(pluginPath, text);
 
-							BdApi.UI.showToast("Плагин обновлён. Перезапусти Discord.", { type: "success" });
+							BdApi.UI.showToast("Плагин обновлён. Перезапуск Discord...", { type: "success" });
+
+							setTimeout(() => {
+								BdApi.restart();
+							}, 1000);
 						}
 					}
 				);
@@ -609,4 +613,3 @@ module.exports = (() => {
 		};
 	})(window.BDFDB_Global.PluginUtils.buildPlugin({}));
 })();
-
