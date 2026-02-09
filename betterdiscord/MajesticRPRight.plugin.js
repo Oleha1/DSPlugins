@@ -1,7 +1,7 @@
 /**
  * @name MajesticRPSANGRight
- * @author Oleha discrod: mroleha
- * @version 1.0.6
+ * @author Oleha
+ * @version 1.0.7
  * @description Majestic RP Right Click version.
  * @source https://github.com/Oleha1/BDPlugin
  */
@@ -11,7 +11,7 @@ const TARGET_CHANNEL_ID_KA = "1214393282201919542"
 
 const TARGET_CHANNEL_ID_MI = "1214393282201919543";
 
-const PLUGIN_VERSION = "1.0.6";
+const PLUGIN_VERSION = "1.0.7";
 const UPDATE_URL = "https://raw.githubusercontent.com/Oleha1/DSPlugins/main/betterdiscord/MajesticRPRight.plugin.js";
 const PLUGIN_FILE_NAME = "MajesticRPRight.plugin.js";
 
@@ -202,6 +202,21 @@ module.exports = (() => {
 						"Военный билет отписан!"
 					)
 				}
+			},
+			{
+				type: "separator",
+			},
+			{
+				type: "item",
+				id: "buttonInfo",
+				name: "Информация",
+				action: function (message , channel) {
+					BDFDB.ModalUtils.open(this, {
+						header: "Информация",
+						size: "LARGE",
+						children: BdApi.React.createElement(Info)
+					});
+				}
 			}
 		]
 
@@ -372,20 +387,25 @@ module.exports = (() => {
 			])
 		}
 
-		function renderButton(onClick) {
+		function renderButton(onClick, text = "Отправить отчёт", color = "rgb(0, 103, 199)", icon = null) {
 			return BdApi.React.createElement("button", {
 				style: { 
 					marginTop: 10, 
-					padding: "6px 12px",
+					padding: "6px 6px",
 					fontSize: "18px",
 					color: "white",
 					cursor: "pointer", 
-					backgroundColor: "rgb(0, 103, 199)", 
+					backgroundColor: color, 
 					border: "none", 
-					borderRadius: "6px"
+					borderRadius: "6px",
+					display: "flex",
+    				alignItems: "center"
 				},
 				onClick: onClick
-			}, "Отправить отчёт")
+			}, [
+				icon,
+				BdApi.React.createElement("span", {}, text)
+			]);
 		}
 
 		function closeMenu() {
@@ -398,6 +418,67 @@ module.exports = (() => {
 				cancelable: true
 			}));
 		}
+
+		function GitHubIcon(size = 24, color = "white") {
+			return BdApi.React.createElement("svg", {
+				width: size,
+				height: size,
+				viewBox: "0 0 24 24",
+				fill: color
+			}, BdApi.React.createElement("path", {
+				d: "M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2.2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.2-1.2-1.5-1.2-1.5-1-.7.1-.7.1-.7 1.1.1 1.7 1.1 1.7 1.1 1 .1.6 2.3 2.8 2.3.4-.7.8-1.1 1.2-1.3-2.6-.3-5.4-1.3-5.4-5.9 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.6.1-3.3 0 0 1-.3 3.3 1.2 1-.3 2.1-.4 3.2-.4s2.2.1 3.2.4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 3 .1 3.3.8.8 1.2 1.8 1.2 3.1 0 4.6-2.8 5.6-5.4 5.9.4.3.8 1 .8 2v3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"
+			}));
+		}
+
+		function DiscordIcon(size = 24, color = "white") {
+			return BdApi.React.createElement("svg", {
+				width: size,
+				height: size,
+				viewBox: "0 0 16 16",
+				fill: color
+			}, BdApi.React.createElement("path", {
+				d: "M13.545 2.907a13.2 13.2 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.2 12.2 0 0 0-3.658 0 8 8 0 0 0-.412-.833.05.05 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.04.04 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032q.003.022.021.037a13.3 13.3 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019q.463-.63.818-1.329a.05.05 0 0 0-.01-.059l-.018-.011a9 9 0 0 1-1.248-.595.05.05 0 0 1-.02-.066l.015-.019q.127-.095.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .053.007q.121.1.248.195a.05.05 0 0 1-.004.085 8 8 0 0 1-1.249.594.05.05 0 0 0-.03.03.05.05 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.2 13.2 0 0 0 4.001-2.02.05.05 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.03.03 0 0 0-.02-.019m-8.198 7.307c-.789 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612m5.316 0c-.788 0-1.438-.724-1.438-1.612s.637-1.613 1.438-1.613c.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612"
+			}));
+		}
+
+
+class Info extends BdApi.React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		return BdApi.React.createElement("div", {
+
+		}, [
+			BdApi.React.createElement("span", {}, 
+				"Данный плагин автоматизирует работу с K.A в фракционных Discord серверах."
+			),
+
+			BdApi.React.createElement("div", {
+				style: {
+					display: "flex",
+					flexDirection: "column",
+					marginTop: "20px"
+				}
+			}, [
+				BdApi.React.createElement("span", {}, 
+					"Если у вас есть идеи для улучшения/изменения плагина — пишите в Discord."
+				),
+				BdApi.React.createElement("div",{
+					style: {
+						display: "flex",
+						gap: "10px",
+					}
+				},[
+					renderButton(() => window.open("https://github.com/Oleha1/DSPlugins", "_blank"),"","rgb(15, 15, 15)",GitHubIcon()),
+					renderButton(() => window.open("https://discord.com/users/1063164463571796100", "_blank"),"", "rgb(114,137,218)",DiscordIcon())
+				])
+			])
+		]);
+	}
+}
+
 
 		class TranslationModal extends BdApi.React.Component {
 			constructor(props) {
