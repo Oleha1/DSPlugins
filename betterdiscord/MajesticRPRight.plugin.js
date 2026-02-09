@@ -1,7 +1,7 @@
 /**
  * @name MajesticRPSANGRight
  * @author Oleha
- * @version 1.0.7
+ * @version 1.0.8
  * @description Majestic RP Right Click version.
  * @source https://github.com/Oleha1/BDPlugin
  */
@@ -11,7 +11,7 @@ const TARGET_CHANNEL_ID_KA = "1214393282201919542"
 
 const TARGET_CHANNEL_ID_MI = "1214393282201919543";
 
-const PLUGIN_VERSION = "1.0.7";
+const PLUGIN_VERSION = "1.0.8";
 const UPDATE_URL = "https://raw.githubusercontent.com/Oleha1/DSPlugins/main/betterdiscord/MajesticRPRight.plugin.js";
 const PLUGIN_FILE_NAME = "MajesticRPRight.plugin.js";
 
@@ -67,7 +67,7 @@ module.exports = (() => {
 							BdApi.UI.showToast("Плагин обновлён. Перезапуск Discord...", { type: "success" });
 
 							setTimeout(() => {
-								BdApi.restart();
+								location.reload();
 							}, 1000);
 						}
 					}
@@ -696,4 +696,5 @@ class Info extends BdApi.React.Component {
 		};
 	})(window.BDFDB_Global.PluginUtils.buildPlugin({}));
 })();
+
 
