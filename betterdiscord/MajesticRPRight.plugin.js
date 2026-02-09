@@ -1,7 +1,7 @@
 /**
  * @name MajesticRPSANGRight
  * @author Oleha
- * @version 1.0.8
+ * @version 1.0.9
  * @description Majestic RP Right Click version.
  * @source https://github.com/Oleha1/BDPlugin
  */
@@ -11,7 +11,7 @@ const TARGET_CHANNEL_ID_KA = "1214393282201919542"
 
 const TARGET_CHANNEL_ID_MI = "1214393282201919543";
 
-const PLUGIN_VERSION = "1.0.8";
+const PLUGIN_VERSION = "1.0.9";
 const UPDATE_URL = "https://raw.githubusercontent.com/Oleha1/DSPlugins/main/betterdiscord/MajesticRPRight.plugin.js";
 const PLUGIN_FILE_NAME = "MajesticRPRight.plugin.js";
 
@@ -51,27 +51,20 @@ module.exports = (() => {
 			const remoteVersion = match[1];
 			
 			if (remoteVersion !== PLUGIN_VERSION) {
-				BdApi.UI.showConfirmationModal(
-					"Доступно обновление",
-					`Текущая версия: ${PLUGIN_VERSION}\nНовая версия: ${remoteVersion}\n\nПерезапустить Discord после обновления?`,
-					{
-						confirmText: "Обновить и перезапустить",
-						cancelText: "Отмена",
-						onConfirm: () => {
-							const fs = require("fs");
-							const path = require("path");
+				setTimeout(() => {
+					const fs = require("fs");
+					const path = require("path");
 
-							const pluginPath = path.join(BdApi.Plugins.folder, PLUGIN_FILE_NAME);
-							fs.writeFileSync(pluginPath, text);
+					const pluginPath = path.join(BdApi.Plugins.folder, PLUGIN_FILE_NAME);
+					fs.writeFileSync(pluginPath, text);
 
-							BdApi.UI.showToast("Плагин обновлён. Перезапуск Discord...", { type: "success" });
+					BdApi.UI.showToast("Плагин обновлён. Перезагрузка Discord...", { type: "success" });
 
-							setTimeout(() => {
-								location.reload();
-							}, 1000);
-						}
-					}
-				);
+					setTimeout(() => {
+						location.reload();
+					}, 1000);
+
+				}, 5000);
 			}
 		} catch (err) {
 			console.error("Ошибка проверки обновления:", err);
@@ -696,5 +689,6 @@ class Info extends BdApi.React.Component {
 		};
 	})(window.BDFDB_Global.PluginUtils.buildPlugin({}));
 })();
+
 
 
