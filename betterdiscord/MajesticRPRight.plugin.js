@@ -1,7 +1,7 @@
 /**
  * @name MajesticRPSANGRight
  * @author Oleha
- * @version 1.1.0
+ * @version 1.1.1
  * @description Majestic RP Right Click version.
  * @source https://github.com/Oleha1/DSPlugins
  */
@@ -14,10 +14,12 @@ const TARGET_CHANNEL_ID_MI = "1214393282201919543";
 const fs = require("fs");
 const path = require("path");
 
-const PLUGIN_VERSION = "1.1.0";
+const PLUGIN_VERSION = "1.1.1";
 const UPDATE_URL = "https://raw.githubusercontent.com/Oleha1/DSPlugins/main/betterdiscord/MajesticRPRight.plugin.js";
 const ASSETS_URL = "https://raw.githubusercontent.com/Oleha1/DSPlugins/main/assets/svg/";
 const PLUGIN_FILE_NAME = "MajesticRPRight.plugin.js";
+
+let messageURL = []
 
 const ASSETS = [
   "Promotion.svg",
@@ -27,7 +29,9 @@ const ASSETS = [
   "MilitaryID.svg",
   "Info.svg",
   "GitHub.svg",
-  "Discord.svg"
+  "Discord.svg",
+  "AddReport.svg",
+  "SendReport.svg"
 ];
 
 module.exports = (() => {
@@ -234,7 +238,6 @@ module.exports = (() => {
 				type: "item",
 				id: "buttonMilitaryID",
 				name: "Военный билет",
-				svg: "",
 				action: function (message , channel) {
 					let selfId = BdApi.Webpack.getModule(m => m.getCurrentUser).getCurrentUser().id;
 
@@ -243,6 +246,30 @@ module.exports = (() => {
 						`1. <@${selfId}> ${getUserStatick(selfId)}\n2. <@${message.author.id}> ${getUserStatick(message.author.id)}\n3. ${getData()}\n4. ${createLink(channel,message)}`,
 						"Военный билет отписан!"
 					)
+				}
+			},
+			{
+				type: "separator",
+			},
+			{
+				type: "item",
+				id: "buttonAddReport",
+				name: "Добавить в отчёт",
+				action: function (message , channel) {
+					messageURL.push(createLink(channel,message));
+					BdApi.UI.showToast("Ссылка добавлена!", { type: "success" });
+				}
+			},
+			{
+				type: "item",
+				id: "buttonSendReport",
+				name: "Отправить отчёт",
+				action: function (message , channel) {
+					BDFDB.ModalUtils.open(this, {
+						header: "Подробности отчёта",
+						size: "LARGE",
+						children: BdApi.React.createElement(Report, {msg: message, channel })
+					});
 				}
 			},
 			{
@@ -267,7 +294,7 @@ module.exports = (() => {
 				for (const embed of msg.embeds) {
 					if (embed.fields) {
 						for (const field of embed.fields) {
-							if (field.rawName == "Discord пользователь") return field.rawValue.slice(2, field.rawValue.length - 1);
+							if (field.rawName == "Discord пользователя") return field.rawValue.slice(2, field.rawValue.length - 1);
 						}
 					}
 				}
@@ -472,44 +499,92 @@ module.exports = (() => {
 			});
 		}
 
+		class Report extends BdApi.React.Component {
+			constructor(props) {
+				super(props);
+				this.state = { reportText: "" };
+			}
 
-class Info extends BdApi.React.Component {
-	constructor(props) {
-		super(props);
-	}
-
-	render() {
-		return BdApi.React.createElement("div", {
-
-		}, [
-			BdApi.React.createElement("span", {}, 
-				"Данный плагин автоматизирует работу с K.A в фракционных Discord серверах."
-			),
-
-			BdApi.React.createElement("div", {
-				style: {
-					display: "flex",
-					flexDirection: "column",
-					marginTop: "20px"
-				}
-			}, [
-				BdApi.React.createElement("span", {}, 
-					"Если у вас есть идеи для улучшения/изменения плагина — пишите в Discord."
-				),
-
-				BdApi.React.createElement("div",{
+			render() {
+				const { msg, channel} = this.props;
+				const { reportText } = this.state;
+				
+				const result = BdApi.React.createElement("div", {
 					style: {
-						display: "flex",
-						gap: "10px",
+						padding: 10
 					}
-				},[
-					renderButton(() => window.open("https://github.com/Oleha1/DSPlugins", "_blank"),"","rgb(15, 15, 15)", getSVG("GitHub")),
-					renderButton(() => window.open("https://discord.com/users/1063164463571796100", "_blank"),"", "rgb(114,137,218)",getSVG("Discord"))
-				])
-			])
-		]);
-	}
-}
+				}, [
+					BdApi.React.createElement("div", {
+						style: { 
+							marginTop: 20, 
+							display: "flex", 
+							gap: 10 
+						}
+					}, [
+						renderInput("Отчёт чего",e => { this.setState({ reportText: e.target.value }) }),
+					]),
+					renderButton(() => {
+							if (!reportText.trim()) {
+								BdApi.UI.showToast("Заполните поле: отчёт чего!", { type: "warning" });
+								return;
+							}
+
+							let text = reportText + "\n";
+
+							for (let a = 0; a < messageURL.length; a++) {
+								text += a + ". " + messageURL[a] + "\n"
+							}
+
+							messageURL.length = 0;
+
+							sendMessage(channel.id, text, "Отчёт отписано!", false)
+
+							closeMenu();
+						}
+					)
+				]
+				);
+				return result;
+			}
+		}
+
+		class Info extends BdApi.React.Component {
+			constructor(props) {
+				super(props);
+			}
+
+			render() {
+				return BdApi.React.createElement("div", {
+
+				}, [
+					BdApi.React.createElement("span", {}, 
+						"Данный плагин автоматизирует работу с K.A в фракционных Discord серверах."
+					),
+
+					BdApi.React.createElement("div", {
+						style: {
+							display: "flex",
+							flexDirection: "column",
+							marginTop: "20px"
+						}
+					}, [
+						BdApi.React.createElement("span", {}, 
+							"Если у вас есть идеи для улучшения/изменения плагина — пишите в Discord."
+						),
+
+						BdApi.React.createElement("div",{
+							style: {
+								display: "flex",
+								gap: "10px",
+							}
+						},[
+							renderButton(() => window.open("https://github.com/Oleha1/DSPlugins", "_blank"),"","rgb(15, 15, 15)", getSVG("GitHub")),
+							renderButton(() => window.open("https://discord.com/users/1063164463571796100", "_blank"),"", "rgb(114,137,218)",getSVG("Discord"))
+						])
+					])
+				]);
+			}
+		}
 
 
 		class TranslationModal extends BdApi.React.Component {
