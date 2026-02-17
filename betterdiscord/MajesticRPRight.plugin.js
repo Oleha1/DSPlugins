@@ -1,7 +1,7 @@
 /**
  * @name MajesticRPSANGRight
  * @author Oleha
- * @version 1.1.2
+ * @version 1.1.3
  * @description Majestic RP Right Click version.
  * @source https://github.com/Oleha1/DSPlugins
  */
@@ -13,8 +13,9 @@ const TARGET_CHANNEL_ID_MI = "1214393282201919543";
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
-const PLUGIN_VERSION = "1.1.2";
+const PLUGIN_VERSION = "1.1.3";
 const UPDATE_URL = "https://raw.githubusercontent.com/Oleha1/DSPlugins/main/betterdiscord/MajesticRPRight.plugin.js";
 const ASSETS_URL = "https://raw.githubusercontent.com/Oleha1/DSPlugins/main/assets/svg/";
 const PLUGIN_FILE_NAME = "MajesticRPRight.plugin.js";
@@ -104,18 +105,18 @@ module.exports = (() => {
 				const res = await fetchNoCache(`${ASSETS_URL}${file}`);
 				if (!res.ok) continue;
 
-				const remoteArray = new Uint8Array(await res.arrayBuffer());
+				const remoteBuffer = Buffer.from(await res.arrayBuffer());
 
 				if (!fs.existsSync(localPath)) {
-					fs.writeFileSync(localPath, remoteArray);
+					fs.writeFileSync(localPath, remoteBuffer);
 					console.log("Downloaded", file);
 					continue;
 				}
 
-				const localArray = new Uint8Array(fs.readFileSync(localPath));
+				const localBuffer = fs.readFileSync(localPath);
 
-				if (!buffersEqual(localArray, remoteArray)) {
-					fs.writeFileSync(localPath, remoteArray);
+				if (hash(localBuffer) !== hash(remoteBuffer)) {
+					fs.writeFileSync(localPath, remoteBuffer);
 					console.log("Updated", file);
 				} else {
 					console.log("No changes", file);
@@ -128,15 +129,11 @@ module.exports = (() => {
 	}
 
 	async function fetchNoCache(url) {
-		return fetch(`${url}?t=${Date.now()}`);
+		return fetch(`${url}${url.includes("?") ? "&" : "?"}t=${Date.now()}`);
 	}
 
-	function buffersEqual(a, b) {
-		if (a.length !== b.length) return false;
-		for (let i = 0; i < a.length; i++) {
-			if (a[i] !== b[i]) return false;
-		}
-		return true;
+	function hash(buf) {
+		return crypto.createHash("sha1").update(buf).digest("hex");
 	}
 
 	return (([Plugin, BDFDB]) => {
